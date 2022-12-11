@@ -51,10 +51,43 @@ def downsample_images(args):
     print(f"rgb paths length: {len(rgb_paths)}")
     print("rbg_paths:\n", rgb_paths)
     if rgb_paths == []: rgb_paths = list(indir.glob(f"*_RGB*.{args.rgb_suffix}"))  # original file names
+    
+    for rgb_path in tqdm(rgb_paths):
+
+        # load
+        agl_path = rgb_path.with_name(
+            rgb_path.name.replace("_RGB", "_AGL")
+        ).with_suffix(".tif")
+        vflow_path = rgb_path.with_name(
+            rgb_path.name.replace("_RGB", "_VFLOW")
+        ).with_suffix(".json")
+        rgb = load_image(rgb_path, args)  # args.unit used to convert units on load
+        agl = load_image(agl_path, args)  # args.unit used to convert units on load
+        _, _, _, vflow_data = load_vflow(
+            vflow_path, agl, args
+        )  # arg.unit used to convert units on load
+
+        # downsample
+        target_shape = (int(rgb.shape[0] / downsample), int(rgb.shape[1] / downsample))
+        rgb = cv2.resize(rgb, target_shape)
+        agl = cv2.resize(agl, target_shape, interpolation=cv2.INTER_NEAREST)
+        vflow_data["scale"] /= downsample
+
+        # save
+        # units are NOT converted back here, so are in m
+#        save_image((outdir / rgb_path.name), rgb)
+        save_image((outdir / rgb_path.name.replace("j2k","tif")), rgb) # save as tif to be consistent with old code
+
+        save_image((outdir / agl_path.name), agl)
+        with open((outdir / vflow_path.name), "w") as outfile:
+            json.dump(vflow_data, outfile)
+    
+    """
     pool = Pool(args.workers)
     with tqdm(total=len(rgb_paths)) as pbar:
         for v in pool.imap_unordered(partial(downsample_rg_path, outdir=outdir, downsample=args.downsample), rgb_paths):
             pbar.update()
+    """
 
 
 if __name__ == "__main__":
