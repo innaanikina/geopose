@@ -15,9 +15,11 @@ def downsample_rg_path(rgb_path: Path, outdir: Path, downsample=1):
     agl_path = rgb_path.with_name(
         rgb_path.name.replace("_RGB", "_AGL")
     ).with_suffix(".tif")
+    print(f"agl path: {agl_path}")
     vflow_path = rgb_path.with_name(
         rgb_path.name.replace("_RGB", "_VFLOW")
     ).with_suffix(".json")
+    print(f"vflow_path: {vflow_path}")
     rgb = load_image(rgb_path, args)  # args.unit used to convert units on load
     agl = load_image(agl_path, args)  # args.unit used to convert units on load
     _, _, _, vflow_data = load_vflow(
