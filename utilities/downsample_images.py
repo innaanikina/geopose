@@ -43,7 +43,6 @@ def downsample_rg_path(rgb_path: Path, outdir: Path, downsample=1):
 
 
 def downsample_images(args):
-    downsample = 1
     indir = Path(args.indir)
     outdir = Path(args.outdir)
 
@@ -69,6 +68,7 @@ def downsample_images(args):
         )  # arg.unit used to convert units on load
 
         # downsample
+        downsample=args.downsample
         target_shape = (int(rgb.shape[0] / downsample), int(rgb.shape[1] / downsample))
         rgb = cv2.resize(rgb, target_shape)
         agl = cv2.resize(agl, target_shape, interpolation=cv2.INTER_NEAREST)
