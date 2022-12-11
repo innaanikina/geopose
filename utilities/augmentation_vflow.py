@@ -3,7 +3,7 @@ import math
 import numpy as np
 import cv2
 
-from invert_flow import invert_flow
+from utilities.invert_flow import invert_flow
 
 
 RNG = np.random.RandomState(1234)
