@@ -1,3 +1,5 @@
+echo "in dist_train.sh"
+
 DATA=$1
 WDATA=$2
 FOLD=$3
