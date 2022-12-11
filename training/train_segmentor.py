@@ -146,8 +146,10 @@ def parse_args():
 
 
 def create_data_datasets(args):
+    print("Start create train dataset")
     train_dataset = GeoposeDataset(mode="train", dataset_dir=args.data_dir, folds_csv=args.folds_csv, fold=args.fold,
-                                   crop_size=args.crop, multiplier=args.multiplier)
+                                       crop_size=args.crop, multiplier=args.multiplier)
+    print("Start create val dataset")
     val_dataset = GeoposeDataset(mode="val", dataset_dir=args.data_dir, folds_csv=args.folds_csv, fold=args.fold,
                                  crop_size=args.crop)
     if args.city:
@@ -175,6 +177,7 @@ def main():
         zero_score=args.zero_score
     )
 
+    print("Starting create data datasets")
     data_train, data_val = create_data_datasets(args)
     seg_evaluator = GeoposeEvaluator(args)
     trainer = PytorchTrainer(train_config=trainer_config, evaluator=seg_evaluator, fold=args.fold,

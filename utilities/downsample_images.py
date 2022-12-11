@@ -46,6 +46,8 @@ def downsample_images(args):
 
     outdir.mkdir(exist_ok=True)
     rgb_paths = list(indir.glob(f"*_RGB.{args.rgb_suffix}"))
+    print(f"rgb paths length: {len(rgb_paths)}")
+    print("rbg_paths:\n", rgb_paths)
     if rgb_paths == []: rgb_paths = list(indir.glob(f"*_RGB*.{args.rgb_suffix}"))  # original file names
     pool = Pool(args.workers)
     with tqdm(total=len(rgb_paths)) as pbar:
