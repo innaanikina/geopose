@@ -1,0 +1,6 @@
+TrainConfiguration(config_path='configs/v2l.json', gpu='0', distributed=True, from_zero=False, zero_score=False, local_rank=0, freeze_epochs=0, test_every=2, world_size=1, output_dir='weights/', prefix='folds_', resume_checkpoint='', workers=8, log_dir='logs')
+param_groups 2
+TrainConfiguration(config_path='configs/v2l_tune.json', gpu='0', distributed=True, from_zero=True, zero_score=False, local_rank=0, freeze_epochs=0, test_every=2, world_size=1, output_dir='weights/', prefix='folds_', resume_checkpoint='weights/folds_TimmUnet_tf_efficientnetv2_l_in21k_5_r2', workers=8, log_dir='logs')
+=> loading checkpoint 'weights/folds_TimmUnet_tf_efficientnetv2_l_in21k_5_r2'
+=> loaded checkpoint 'weights/folds_TimmUnet_tf_efficientnetv2_l_in21k_5_r2' (epoch 134)
+param_groups 2
