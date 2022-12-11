@@ -1,3 +1,5 @@
+echo "in dist_train_tune.sh"
+
 DATA=$1
 WDATA=$2
 FOLD=$3

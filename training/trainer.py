@@ -8,7 +8,7 @@ from typing import Dict, List
 import torch
 import torch.distributed
 import torch.distributed as dist
-from tensorboardX import SummaryWriter
+from tensorboard import SummaryWriter
 from timm.utils import AverageMeter
 from torch.nn import DataParallel, SyncBatchNorm
 from torch.nn.parallel import DistributedDataParallel
