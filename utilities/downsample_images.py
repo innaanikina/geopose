@@ -43,6 +43,7 @@ def downsample_rg_path(rgb_path: Path, outdir: Path, downsample=1):
 
 
 def downsample_images(args):
+    downsample = 1
     indir = Path(args.indir)
     outdir = Path(args.outdir)
 
