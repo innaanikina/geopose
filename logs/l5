@@ -8,6 +8,6 @@ in dist_train_tune.sh
 Starting create data datasets
 Start create train dataset
 Start create val dataset
-TrainConfiguration(config_path='configs/v2l_tune.json', gpu='0', distributed=True, from_zero=True, zero_score=False, local_rank=0, freeze_epochs=0, test_every=2, world_size=1, output_dir='weights/', prefix='folds_', resume_checkpoint='weights/folds_TimmUnet_tf_efficientnetv2_l_in21k_5_r2', workers=8, log_dir='logs')
-=> no checkpoint found at 'weights/folds_TimmUnet_tf_efficientnetv2_l_in21k_5_r2'
+TrainConfiguration(config_path='configs/v2l_tune.json', gpu='0', distributed=True, from_zero=True, zero_score=False, local_rank=0, freeze_epochs=0, test_every=2, world_size=1, output_dir='weights/', prefix='folds_', resume_checkpoint='/content/drive/MyDrive/Github/geopose/weights/folds_TimmUnet_tf_efficientnetv2_l_in21k_5_r2', workers=8, log_dir='logs')
+=> no checkpoint found at '/content/drive/MyDrive/Github/geopose/weights/folds_TimmUnet_tf_efficientnetv2_l_in21k_5_r2'
 param_groups 2
