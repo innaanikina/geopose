@@ -34,7 +34,7 @@ class TrainConfiguration:
     freeze_epochs: int = 0,
     test_every: int = 1
     world_size: int = 1
-    output_dir: str = "weights"
+    output_dir: str = "/content/drive/MyDrive/Github/geopose/weights/"
     prefix: str = ""
     resume_checkpoint: str = None
     workers: int = 8
@@ -71,6 +71,7 @@ class PytorchTrainer(ABC):
                  fold: int,
                  train_data: Dataset,
                  val_data: Dataset) -> None:
+        print("init pytorch trainer")
         super().__init__()
         self.fold = fold
         self.train_config = train_config
@@ -89,6 +90,7 @@ class PytorchTrainer(ABC):
         self.summary_writer = SummaryWriter(os.path.join(train_config.log_dir,  self.snapshot_name))
 
     def fit(self):
+        print("fit pytorch trainer")
         for epoch in range(self.current_epoch, self.conf["optimizer"]["schedule"]["epochs"]):
             self.current_epoch = epoch
             self.model.train()
@@ -119,6 +121,7 @@ class PytorchTrainer(ABC):
         }, os.path.join(self.train_config.output_dir, self.snapshot_name + "_last"))
 
     def _save_best(self, improved_metrics: Dict):
+        print("__save_best pytorch trainer")
         self.model = self.model.eval()
         for metric_name in improved_metrics.keys():
             torch.save({

@@ -185,6 +185,7 @@ def main():
     try:
         trainer.fit()
     except:
+        print("exception!")
         traceback.print_exc()
         dist.destroy_process_group()
 
