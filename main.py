@@ -6,7 +6,7 @@ import torch
 os.environ["MKL_NUM_THREADS"] = "1"
 os.environ["NUMEXPR_NUM_THREADS"] = "1"
 os.environ["OMP_NUM_THREADS"] = "1"
-os.environ["LOCAL_RANK] = "0"
+os.environ["LOCAL_RANK"] = "0"
 import cv2
 import torch.distributed as dist
 
