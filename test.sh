@@ -1,8 +1,5 @@
-PYTHONPATH=. python utilities/cythonize_invert_flow.py build_ext --inplace
-
 DATA=$1
 GPUS=$2
-RGB_SUF=$3
 
 PYTHONPATH=.   python -u -m torch.distributed.launch \
  --nproc_per_node=$GPUS \
@@ -17,8 +14,6 @@ PYTHONPATH=.   python -u -m torch.distributed.launch \
 --unit="cm" \
 --downsample=1 \
 --test-sub-dir="" \
---convert-predictions-to-cm-and-compress=True \
---rgb-suffix=$RGB_SUF
-
+--convert-predictions-to-cm-and-compress=True
 
 python gen_tar.py
