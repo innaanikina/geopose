@@ -81,8 +81,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    dist.init_process_group(backend="nccl", rank=args.local_rank, world_size=args.world_size)
-    torch.cuda.set_device(args.local_rank)
+    dist.init_process_group(backend="nccl", rank=local_rank, world_size=args.world_size)
+    torch.cuda.set_device(local_rank)
 
     if args.test:
         os.makedirs(args.predictions_dir, exist_ok=True)
