@@ -34,6 +34,18 @@ RNG = np.random.RandomState(4321)
 
 CITIES = ["ARG", "ATL", "JAX", "OMA"]
 
+# my code start
+
+from json import JSONEncoder
+
+class EncodeTensor(JSONEncoder, BaseDataset):
+    def default(self, obj):
+        if isinstance(obj, torch.Tensor):
+            return obj.cpu().detach().numpy().tolist()
+        return super(NpEncoder, self).default(obj)
+        
+# my code end 
+
 
 class Dataset(BaseDataset):
     def __init__(
@@ -49,28 +61,20 @@ class Dataset(BaseDataset):
         self.rng = rng
 
         # create all paths with respect to RGB path ordering to maintain alignment of samples
-        print("dataset_dir: ", args.dataset_dir)
-        print("sub_dir: ", sub_dir)
         dataset_dir = Path(args.dataset_dir) / sub_dir
-        print(dataset_dir)
         rgb_paths = list(dataset_dir.glob(f"*_RGB.{args.rgb_suffix}"))
-        print(rgb_paths)
         if rgb_paths == []: rgb_paths = list(dataset_dir.glob(f"*_RGB*.{args.rgb_suffix}"))  # original file names
-        print(rgb_paths)
         agl_paths = list(
             pth.with_name(pth.name.replace("_RGB", "_AGL")).with_suffix(".tif")
             for pth in rgb_paths
         )
-        print(agl_paths)
         vflow_paths = list(
             pth.with_name(pth.name.replace("_RGB", "_VFLOW")).with_suffix(".json")
             for pth in rgb_paths
         )
-        print(vflow_paths)
 
         if self.is_test:
             self.paths_list = rgb_paths
-            print("if__ self.paths_list: ", self.paths_list)
         else:
             self.paths_list = [
                 (rgb_paths[i], vflow_paths[i], agl_paths[i])
@@ -83,7 +87,6 @@ class Dataset(BaseDataset):
             ]
             if args.sample_size is not None:
                 self.paths_list = self.paths_list[: args.sample_size]
-            print("else__ self.paths_list: ", self.paths_list)
 
         self.args = args
         self.sub_dir = sub_dir
@@ -152,6 +155,8 @@ class Dataset(BaseDataset):
 
 
 def test(args):
+    local_rank = int(os.environ["LOCAL_RANK"])
+
     model_paths = args.model_path
     models = []
     torch.backends.cudnn.benchmark = True
@@ -165,21 +170,18 @@ def test(args):
         state_dict = {re.sub("^module.", "", k): w for k, w in state_dict.items()}
         model.load_state_dict(state_dict)
         model.cuda()
-        model = DistributedDataParallel(model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
+        model = DistributedDataParallel(model, device_ids=[local_rank], output_device=local_rank, find_unused_parameters=True)
         model.eval()
         models.append(model)
 
     with torch.no_grad():
 
-        print("test_data_dir: ", args.test_sub_dir)
         test_dataset = Dataset(sub_dir=args.test_sub_dir, args=args)
-        print("dataset size: ", len(test_dataset))
         sampler = torch.utils.data.distributed.DistributedSampler(test_dataset, shuffle=False)
         test_loader = DataLoader(
-            test_dataset, batch_size=args.batch_size, sampler=sampler, shuffle=False, num_workers=4, pin_memory=True
+            test_dataset, batch_size=args.batch_size, sampler=sampler, shuffle=False, num_workers=2, pin_memory=True
         )
         predictions_dir = Path(args.predictions_dir)
-        print("predictions_dir: ", predictions_dir)
         for images, rgb_paths in tqdm(test_loader):
             images = images.float().cuda()
             pred = predict_tta(models, images)
@@ -226,11 +228,11 @@ def test(args):
 
                 json.dump(vflow_data, vflow_path.open("w"))
                 save_image(agl_path, agl_resized)  # save_image assumes units of meters
-    print(f"Rank {args.local_rank} finished")
+    print(f"Rank {local_rank} finished")
     dist.barrier()
     print("postprocessing")
 
-    if args.local_rank == 0:
+    if local_rank == 0:
         # creates new dir predictions_dir_con
         if args.convert_predictions_to_cm_and_compress:
             convert_and_compress_prediction_dir(predictions_dir=predictions_dir)

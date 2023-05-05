@@ -6,6 +6,7 @@ import torch
 os.environ["MKL_NUM_THREADS"] = "1"
 os.environ["NUMEXPR_NUM_THREADS"] = "1"
 os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["LOCAL_RANK] = "0"
 import cv2
 import torch.distributed as dist
 
@@ -18,7 +19,7 @@ if __name__ == "__main__":
     parser.add_argument("--train", action="store_true", help="train model")
     parser.add_argument("--test", action="store_true", help="generate test predictions")
     parser.add_argument("--gpus", type=str, default="0")
-    parser.add_argument("--local_rank", type=int, default=0)
+    # parser.add_argument("--local_rank", type=int, default=0)
     parser.add_argument("--world_size", type=int, default=2)
     parser.add_argument(
         "--num-workers", type=int, help="number of data loader workers", default=1
