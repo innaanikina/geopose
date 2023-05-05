@@ -80,7 +80,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-
+    local_rank = int(os.environ["LOCAL_RANK"])
     dist.init_process_group(backend="nccl", rank=local_rank, world_size=args.world_size)
     torch.cuda.set_device(local_rank)
 
