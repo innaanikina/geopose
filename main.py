@@ -86,7 +86,8 @@ if __name__ == "__main__":
     torch.cuda.set_device(local_rank)
 
     if args.predict:
-        pass
+        from utilities.inference import predict
+        predict(args)
 
     elif args.test:
         os.makedirs(args.predictions_dir, exist_ok=True)
