@@ -2,6 +2,7 @@ import json
 import os
 import random
 import re
+import math
 
 from utilities.augmentation_vflow import augment_vflow
 
@@ -236,3 +237,41 @@ def test(args):
         # creates new dir predictions_dir_con
         if args.convert_predictions_to_cm_and_compress:
             convert_and_compress_prediction_dir(predictions_dir=predictions_dir)
+
+
+def predict(args):
+    local_rank = int(os.environ["LOCAL_RANK"])
+
+    model_paths = args.model_path
+    models = []
+    torch.backends.cudnn.benchmark = True
+
+    for model_path in model_paths:
+        model = TimmUnet("tf_efficientnetv2_l_in21k")
+        print(f" loading model from {model_path}")
+        checkpoint = torch.load(model_path, map_location="cpu")
+        state_dict = checkpoint['state_dict']
+        print(f" Epoch {checkpoint['epoch']} metrics: {checkpoint['metrics']}")
+        state_dict = {re.sub("^module.", "", k): w for k, w in state_dict.items()}
+        model.load_state_dict(state_dict)
+        model.cuda()
+        model = DistributedDataParallel(model, device_ids=[local_rank], output_device=local_rank, find_unused_parameters=True)
+        model.eval()
+        models.append(model)
+
+    with torch.no_grad():
+        tile_size = 2048
+        img = load_image(args.dataset_dir, args)
+        w, h, z = img.shape
+        print(f"image shape is: {img.shape}")
+
+        res_shape = (math.ceil(float(w) / tile_size)*tile_size, math.ceil(float(h) / tile_size)*tile_size, z)
+        print(f"res shape: {res_shape}")
+
+        w_new = res_shape[0]
+        h_new = res_shape[1]
+
+        # img = img.float().cuda()
+        # pred = predict_tta(models, img)
+
+        # agl_pred = pred[1].detach().cpu().numpy()
