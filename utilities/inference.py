@@ -287,6 +287,8 @@ def predict(args):
                     print(f'i is {i} j is {j}')
                     frag = img[:, :, i:i+tile_size, j:j+tile_size]
                     print(f"frag shape: {frag.shape}")
+                    frag = torch.from_numpy(frag)
+                    print(f"frag dtype: {frag.dtype}")
                     out = predict_tta(models, frag)
                     print(f"out shape: {out.shape}")
                     agl_pred = out[1].detach().numpy()
