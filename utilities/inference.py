@@ -279,6 +279,7 @@ def predict(args):
         # img = img.float().cuda()
 
         res = np.zeros((1, w_new, h_new), dtype=np.float32)
+        print(f"res final shape: {res.shape}")
         i = j = 0
         step = tile_size
 
@@ -295,7 +296,7 @@ def predict(args):
                     print(f"out length: {len(out)}, out: {out}")
                     agl_pred = out[1].detach().cpu().numpy()
                     print(f"agl pred shape: {agl_pred.shape}")
-
+                    res[:, i:i+tile_size, j:j+tile_size] = agl_pred[0, 0, :, :]
                     j += tile_size
                 i += tile_size
 
