@@ -273,14 +273,16 @@ def predict(args):
         res = np.zeros(res_shape, dtype=np.float32)
         res[:w, :h, :] = img
         img = res
+        img = np.transpose(img, [2, 0, 1])
         img = img.reshape((1,) + img.shape)
         print(f"img final shape: {img.shape}")
         # img = img.float().cuda()
 
         res = np.zeros((1, w_new, h_new), dtype=np.float32)
         i = j = 0
+        step = tile_size
 
-        with tqdm(total = (w_new // tile_size) * (h_new // tile_size)) as pbar:
+        with tqdm(total=(w_new // step) * (h_new // step)) as pbar:
             while i + tile_size <= w_new:
                 j = 0
                 while j + tile_size <= h_new:
