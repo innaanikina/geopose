@@ -270,8 +270,31 @@ def predict(args):
 
         w_new = res_shape[0]
         h_new = res_shape[1]
-
+        res = np.zeros(res_shape, dtype=np.float32)
+        res[:w, :h, :] = img
+        img = res
+        img = img.reshape((1,) + img.shape)
+        print(f"img final shape: {img.shape}")
         # img = img.float().cuda()
+
+        res = np.zeros((1, w_new, h_new), dtype=np.float32)
+        i = j = 0
+
+        with tqdm(total = (w_new // tile_size) * (h_new // tile_size)) as pbar:
+            while i + tile_size <= w_new:
+                j = 0
+                while j + tile_size <= h_new:
+                    print(f'i is {i} j is {j}')
+                    frag = img[:, :, i:i+tile_size, j:j+tile_size]
+                    print(f"frag shape: {frag.shape}")
+                    out = predict_tta(models, frag)
+                    print(f"out shape: {out.shape}")
+                    agl_pred = out[1].detach().numpy()
+                    print(f"agl pred shape: {agl_pred.shape}")
+
+                    j += tile_size
+                i += tile_size
+
         # pred = predict_tta(models, img)
 
         # agl_pred = pred[1].detach().cpu().numpy()
