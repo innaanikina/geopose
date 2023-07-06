@@ -293,7 +293,7 @@ def predict(args):
                     print(f"frag dtype: {frag.dtype}")
                     out = predict_tta(models, frag)
                     print(f"out length: {len(out)}, out: {out}")
-                    agl_pred = out[1].detach().numpy()
+                    agl_pred = out[1].detach().cpu().numpy()
                     print(f"agl pred shape: {agl_pred.shape}")
 
                     j += tile_size
