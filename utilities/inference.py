@@ -292,7 +292,7 @@ def predict(args):
                     frag = torch.from_numpy(frag)
                     print(f"frag dtype: {frag.dtype}")
                     out = predict_tta(models, frag)
-                    print(f"out shape: {out.shape}")
+                    print(f"out length: {len(out)}, out: {out}")
                     agl_pred = out[1].detach().numpy()
                     print(f"agl pred shape: {agl_pred.shape}")
 
