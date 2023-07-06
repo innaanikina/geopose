@@ -28,6 +28,7 @@ from utilities.misc_utils import (
     load_image,
     load_vflow,
     save_image,
+    visualize,
 )
 from utilities.unet import TimmUnet
 
@@ -262,6 +263,7 @@ def predict(args):
     with torch.no_grad():
         tile_size = 2048
         img = load_image(args.dataset_dir, args)
+        image_copy = img
         w, h, z = img.shape
         print(f"image shape is: {img.shape}")
 
@@ -300,6 +302,12 @@ def predict(args):
                     j += tile_size
                 i += tile_size
 
-        # pred = predict_tta(models, img)
+        res = res.reshape((w_new, h_new))
+        res = res[:w, :h]
 
-        # agl_pred = pred[1].detach().cpu().numpy()
+        cv2.imwrite(args.predictions_dir + '/res.tif', res)
+
+        visualize(
+            image=image_copy,
+            predicted=res
+        )

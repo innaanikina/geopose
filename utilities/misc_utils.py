@@ -5,6 +5,7 @@ import json
 import os
 from tqdm import tqdm
 from PIL import Image
+import matplotlib.pyplot as plt
 
 
 UNITS_PER_METER_CONVERSION_FACTORS = {"cm": 100.0, "m": 1.0}
@@ -162,3 +163,18 @@ def convert_and_compress_prediction_dir(
         vflow["scale"] = vflow["scale"] / conversion_factor
         new_json_path = converted_predictions_dir / json_path.name
         json.dump(vflow, new_json_path.open("w"))
+
+
+def visualize(**images):
+    """Функция для визуализации данных, располагает изображения в ряд"""
+    n = len(images)
+    plt.figure(figsize=(16, 5))
+
+    for i, (name, image) in enumerate(images.items()):
+        plt.subplot(1, n, i + 1)
+        plt.xticks([])
+        plt.yticks([])
+        plt.title(' '.join(name.split('_')).title())
+        plt.imshow(image)
+
+    plt.show()
