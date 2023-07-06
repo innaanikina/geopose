@@ -301,7 +301,7 @@ def predict(args):
                     print(f"agl pred shape: {agl_pred.shape}")
                     agl_pred[agl_pred < 0] = 0
                     res[:, i:i+tile_size, j:j+tile_size] = agl_pred[:, :]
-                    print(f"agl sliced: {agl_pred[0, 0, :, :]}")
+                    print(f"agl sliced: {agl_pred[:, :]}")
                     print(f"res: {res}")
                     j += tile_size
                 i += tile_size
