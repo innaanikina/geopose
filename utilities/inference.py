@@ -280,7 +280,8 @@ def predict(args):
         res = np.zeros(res_shape, dtype=np.float32)
         res[:w, :h, :] = img
         img = res
-        img = np.transpose(img, [2, 0, 1])
+        # img = np.transpose(img, [2, 0, 1])
+        img = (np.transpose(img, (2, 0, 1)) / 255. - 0.5) * 2
         img = img.reshape((1,) + img.shape)
         print(f"img final shape: {img.shape}")
         # img = img.float().cuda()
