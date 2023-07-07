@@ -29,6 +29,7 @@ from utilities.misc_utils import (
     load_vflow,
     save_image,
     visualize,
+    save_image_polygonal,
 )
 from utilities.unet import TimmUnet
 
