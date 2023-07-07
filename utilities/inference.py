@@ -310,7 +310,7 @@ def predict(args):
         res = res[:w, :h]
 
         # cv2.imwrite(args.predictions_dir + '/res.tif', res)
-        save_image(args.predictions_dir + '/res2.tif', res)
+        save_image_polygonal(args.predictions_dir + '/res2.tif', res)
 
         visualize(
             image=image_copy,

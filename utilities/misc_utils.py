@@ -34,6 +34,28 @@ def save_image(img_path, img):
     driver = None
 
 
+def save_image_polygonal(img_path, img):
+    rows = img.shape[0]
+    cols = img.shape[1]
+    bands = 1
+    if np.ndim(img) == 3:
+        bands = img.shape[2]
+    if img.dtype == np.uint8:
+        data_type = gdal.GDT_Byte
+    else:
+        data_type = gdal.GDT_Float32
+    driver = gdal.GetDriverByName("GTiff").Create(
+        str(img_path), cols, rows, bands, data_type, ["COMPRESS=LZW"]
+    )
+    if bands == 1:
+        driver.GetRasterBand(1).WriteArray(img[:, :])
+    else:
+        for i in range(bands):
+            driver.GetRasterBand(i + 1).WriteArray(img[:, :, i])
+    driver.FlushCache()
+    driver = None
+
+
 def load_image(
     image_path,
     args,
