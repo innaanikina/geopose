@@ -188,12 +188,13 @@ def test(args):
         for images, rgb_paths in tqdm(test_loader):
             images = images.float().cuda()
             pred = predict_tta(models, images)
-
+            print("pred", pred)
             numpy_preds = []
             for i in range(len(pred)):
                 numpy_preds.append(pred[i].detach().cpu().numpy())
 
             xydir_pred, agl_pred, mag_pred, scale_pred = numpy_preds
+            print("agl_pred", agl_pred)
 
             if scale_pred.ndim == 0:
                 scale_pred = np.expand_dims(scale_pred, axis=0)
@@ -211,6 +212,7 @@ def test(args):
                 # agl pred
                 curr_agl_pred = agl_pred[batch_ind, 0, :, :]
                 curr_agl_pred[curr_agl_pred < 0] = 0
+                print("curr_agl_pred", curr_agl_pred)
                 agl_resized = cv2.resize(
                     curr_agl_pred,
                     (
@@ -219,6 +221,7 @@ def test(args):
                     ),
                     interpolation=cv2.INTER_NEAREST,
                 )
+                print("agl_resized", agl_resized)
 
                 # save
                 rgb_path = predictions_dir / Path(rgb_paths[batch_ind]).name
