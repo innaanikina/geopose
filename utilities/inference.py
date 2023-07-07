@@ -309,7 +309,8 @@ def predict(args):
         res = res.reshape((w_new, h_new))
         res = res[:w, :h]
 
-        cv2.imwrite(args.predictions_dir + '/res.tif', res)
+        # cv2.imwrite(args.predictions_dir + '/res.tif', res)
+        save_image(args.predictions_dir + '/res2.tif', res)
 
         visualize(
             image=image_copy,
