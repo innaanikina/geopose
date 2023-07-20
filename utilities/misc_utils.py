@@ -2,7 +2,7 @@ from pathlib import Path
 from osgeo import gdal
 import numpy as np
 import json
-import os
+import cv2
 from tqdm import tqdm
 from PIL import Image
 import matplotlib.pyplot as plt
@@ -66,8 +66,10 @@ def load_image(
     image_path = Path(image_path)
     if not image_path.exists():
         return None
-    image = gdal.Open(str(image_path))
-    image = image.ReadAsArray()
+    # image = gdal.Open(str(image_path))
+    # image = image.ReadAsArray()
+    image = cv2.imread(str(image_path))
+
     print(f"image shape from load_image: {image.shape}")
 
     # convert AGL units and fill nan placeholder with nan
