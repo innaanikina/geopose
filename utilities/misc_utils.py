@@ -66,9 +66,9 @@ def load_image(
     image_path = Path(image_path)
     if not image_path.exists():
         return None
-    image = gdal.Open(str(image_path))
-    image = image.ReadAsArray()
-    # image = cv2.imread(str(image_path))
+    # image = gdal.Open(str(image_path))
+    # image = image.ReadAsArray()
+    image = cv2.imread(str(image_path))
 
     print(f"image shape from load_image: {image.shape}")
 
@@ -81,8 +81,8 @@ def load_image(
         image = (image / units_per_meter).astype(dtype_out)
 
     # transpose if RGB
-    if len(image.shape) == 3:
-        image = np.transpose(image, [1, 2, 0])
+    # if len(image.shape) == 3:
+    #     image = np.transpose(image, [1, 2, 0])
 
     return image
 
