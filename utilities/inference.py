@@ -269,8 +269,8 @@ def predict(args):
         tile_size = 2048
         img = load_image(args.dataset_dir, args)
         image_copy = img
-        w, h, z = img.shape
         print(f"image shape is: {img.shape}")
+        w, h, z = img.shape
 
         res_shape = (math.ceil(float(w) / tile_size)*tile_size, math.ceil(float(h) / tile_size)*tile_size, z)
         print(f"res shape: {res_shape}")
