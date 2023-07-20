@@ -68,6 +68,7 @@ def load_image(
         return None
     image = gdal.Open(str(image_path))
     image = image.ReadAsArray()
+    print(f"image shape from load_image: {image.shape}")
 
     # convert AGL units and fill nan placeholder with nan
     if "AGL" in image_path.name:
