@@ -277,8 +277,8 @@ def predict(args):
         print(f"rgb_paths: {rgb_paths}")
         print(f"agl paths: {agl_paths}")
 
-        for i in range(len(rgb_paths)):
-            img = load_image(rgb_paths[i], args)
+        for filecount in range(len(rgb_paths)):
+            img = load_image(rgb_paths[filecount], args)
             image_copy = img
             print(f"image shape is: {img.shape}")
             w, h, z = img.shape
@@ -327,4 +327,4 @@ def predict(args):
             res = res[:w, :h]
 
             # cv2.imwrite(args.predictions_dir + '/res.tif', res)
-            save_image_polygonal(agl_paths[i], res)
+            save_image_polygonal(agl_paths[filecount], res)
