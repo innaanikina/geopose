@@ -267,58 +267,64 @@ def predict(args):
 
     with torch.no_grad():
         tile_size = 2048
-        img = load_image(args.dataset_dir, args)
-        image_copy = img
-        print(f"image shape is: {img.shape}")
-        w, h, z = img.shape
-
-        res_shape = (math.ceil(float(w) / tile_size)*tile_size, math.ceil(float(h) / tile_size)*tile_size, z)
-        print(f"res shape: {res_shape}")
-
-        w_new = res_shape[0]
-        h_new = res_shape[1]
-        res = np.zeros(res_shape, dtype=np.float32)
-        res[:w, :h, :] = img
-        img = res
-        # img = np.transpose(img, [2, 0, 1])
-        img = (np.transpose(img, (2, 0, 1)) / 255. - 0.5) * 2
-        img = img.reshape((1,) + img.shape)
-        print(f"img final shape: {img.shape}")
-        # img = img.float().cuda()
-
-        res = np.zeros((1, w_new, h_new), dtype=np.float32)
-        print(f"res final shape: {res.shape}")
-        i = j = 0
-        step = tile_size
-
-        with tqdm(total=(w_new // step) * (h_new // step)) as pbar:
-            while i + tile_size <= w_new:
-                j = 0
-                while j + tile_size <= h_new:
-                    print(f'i is {i} j is {j}')
-                    frag = img[:, :, i:i+tile_size, j:j+tile_size]
-                    print(f"frag shape: {frag.shape}")
-                    frag = torch.from_numpy(frag)
-                    print(f"frag dtype: {frag.dtype}")
-                    out = predict_tta(models, frag)
-                    print(f"out length: {len(out)}, out: {out}")
-                    agl_pred = out[1].detach().cpu().numpy()
-                    agl_pred = agl_pred[0, 0, :, :]
-                    print(f"agl pred shape: {agl_pred.shape}")
-                    agl_pred[agl_pred < 0] = 0
-                    res[:, i:i+tile_size, j:j+tile_size] = agl_pred[:, :]
-                    print(f"agl sliced: {agl_pred[:, :]}")
-                    print(f"res: {res}")
-                    j += tile_size
-                i += tile_size
-
-        res = res.reshape((w_new, h_new))
-        res = res[:w, :h]
-
-        # cv2.imwrite(args.predictions_dir + '/res.tif', res)
-        save_image_polygonal(args.predictions_dir + '/res2.tif', res)
-
-        visualize(
-            image=image_copy,
-            predicted=res
+        dataset_dir = Path(args.dataset_dir)
+        rgb_paths = list(dataset_dir.glob(f"*_RGB.tif"))
+        agl_paths = list(
+            pth.with_name(pth.name.replace("_RGB", "_AGL")).with_suffix(".tif")
+            for pth in rgb_paths
         )
+        agl_paths = [args.predictions_dir / Path(pth.name) for pth in agl_paths]
+        print(f"rgb_paths: {rgb_paths}")
+        print(f"agl paths: {agl_paths}")
+
+        for i in range(len(rgb_paths)):
+            img = load_image(rgb_paths[i], args)
+            image_copy = img
+            print(f"image shape is: {img.shape}")
+            w, h, z = img.shape
+
+            res_shape = (math.ceil(float(w) / tile_size)*tile_size, math.ceil(float(h) / tile_size)*tile_size, z)
+            print(f"res shape: {res_shape}")
+
+            w_new = res_shape[0]
+            h_new = res_shape[1]
+            res = np.zeros(res_shape, dtype=np.float32)
+            res[:w, :h, :] = img
+            img = res
+            # img = np.transpose(img, [2, 0, 1])
+            img = (np.transpose(img, (2, 0, 1)) / 255. - 0.5) * 2
+            img = img.reshape((1,) + img.shape)
+            print(f"img final shape: {img.shape}")
+            # img = img.float().cuda()
+
+            res = np.zeros((1, w_new, h_new), dtype=np.float32)
+            print(f"res final shape: {res.shape}")
+            i = j = 0
+            step = tile_size
+
+            with tqdm(total=(w_new // step) * (h_new // step)) as pbar:
+                while i + tile_size <= w_new:
+                    j = 0
+                    while j + tile_size <= h_new:
+                        # print(f'i is {i} j is {j}')
+                        frag = img[:, :, i:i+tile_size, j:j+tile_size]
+                        # print(f"frag shape: {frag.shape}")
+                        frag = torch.from_numpy(frag)
+                        # print(f"frag dtype: {frag.dtype}")
+                        out = predict_tta(models, frag)
+                        # print(f"out length: {len(out)}, out: {out}")
+                        agl_pred = out[1].detach().cpu().numpy()
+                        agl_pred = agl_pred[0, 0, :, :]
+                        # print(f"agl pred shape: {agl_pred.shape}")
+                        agl_pred[agl_pred < 0] = 0
+                        res[:, i:i+tile_size, j:j+tile_size] = agl_pred[:, :]
+                        # print(f"agl sliced: {agl_pred[:, :]}")
+                        # print(f"res: {res}")
+                        j += tile_size
+                    i += tile_size
+
+            res = res.reshape((w_new, h_new))
+            res = res[:w, :h]
+
+            # cv2.imwrite(args.predictions_dir + '/res.tif', res)
+            save_image_polygonal(agl_paths[i], res)
