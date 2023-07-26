@@ -328,8 +328,8 @@ def predict(args):
                         # print(f"agl sliced: {agl_pred[:, :]}")
                         # print(f"res: {res}")
 
-                        xydir_pred = out[0]
-                        scale_pred = out[3]
+                        xydir_pred = out[0].detach().cpu().numpy()
+                        scale_pred = out[3].detach().cpu().numpy()
                         angle = np.arctan2(xydir_pred[0][0], xydir_pred[0][1])
                         vflow_data = {
                             "scale": np.float64(
