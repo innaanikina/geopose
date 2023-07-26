@@ -268,7 +268,7 @@ def predict(args):
     with torch.no_grad():
         tile_size = 2048
         dataset_dir = Path(args.dataset_dir)
-        rgb_paths = list(dataset_dir.glob(f"*_RGB.tif"))
+        rgb_paths = list(dataset_dir.glob(f"*_RGB.{args.rgb_suffix}"))
         agl_paths = list(
             pth.with_name(pth.name.replace("_RGB", "_AGL")).with_suffix(".tif")
             for pth in rgb_paths
