@@ -274,6 +274,11 @@ def predict(args):
             for pth in rgb_paths
         )
         agl_paths = [args.predictions_dir / Path(pth.name) for pth in agl_paths]
+        vflow_paths = list(
+            pth.with_name(pth.name.replace("_RGB", "_VFLOW")).with_suffix(".json")
+            for pth in rgb_paths
+        )
+        vflow_paths = [args.predictions_dir / Path(pth.name) for pth in vflow_paths]
         print(f"rgb_paths: {rgb_paths}")
         print(f"agl paths: {agl_paths}")
 
@@ -302,6 +307,8 @@ def predict(args):
             i = j = 0
             step = tile_size
 
+            vflow_data = {}
+
             with tqdm(total=(w_new // step) * (h_new // step)) as pbar:
                 while i + tile_size <= w_new:
                     j = 0
@@ -320,6 +327,18 @@ def predict(args):
                         res[:, i:i+tile_size, j:j+tile_size] = agl_pred[:, :]
                         # print(f"agl sliced: {agl_pred[:, :]}")
                         # print(f"res: {res}")
+
+                        xydir_pred = out[0]
+                        scale_pred = out[3]
+                        angle = np.arctan2(xydir_pred[0][0], xydir_pred[0][1])
+                        vflow_data = {
+                            "scale": np.float64(
+                                scale_pred[0] * args.downsample
+                            ),  # upsample
+                            "angle": np.float64(angle),
+                        }
+                        print(f"VFLOW data: {vflow_data}")
+
                         j += tile_size
                     i += tile_size
 
@@ -328,3 +347,4 @@ def predict(args):
 
             # cv2.imwrite(args.predictions_dir + '/res.tif', res)
             save_image_polygonal(agl_paths[filecount], res)
+            json.dump(vflow_data, vflow_paths[filecount].open("w"))
