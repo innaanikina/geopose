@@ -69,7 +69,7 @@ def flip(image, mag, agl, dim):
 
 def get_crop_region(image_rotated, image):
     excess_buffer = np.array(image_rotated.shape[:2]) - np.array(image.shape[:2])
-    r1, c1 = (excess_buffer / 2).astype(np.int)
+    r1, c1 = (excess_buffer / 2).astype(int)
     r2, c2 = np.array([r1, c1]) + image.shape[:2]
     return r1, c1, r2, c2
 
@@ -91,8 +91,8 @@ def rotate_image(image, mag, agl, angle, image_only=False):
     cos, sin = np.abs(rot_mat[0, 0:2])
     wnew = int((h * sin) + (w * cos))
     hnew = int((h * cos) + (w * sin))
-    rot_mat[0, 2] += np.int((wnew / 2) - rw)
-    rot_mat[1, 2] += np.int((hnew / 2) - rh)
+    rot_mat[0, 2] += int((wnew / 2) - rw)
+    rot_mat[1, 2] += int((hnew / 2) - rh)
     image_rotated = (
         None
         if image is None

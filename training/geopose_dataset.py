@@ -100,6 +100,7 @@ class GeoposeDataset(Dataset):
             rng=RNG,
     ):
         self.dataset_dir = dataset_dir
+        print(f'dataset dir in GeoposeDataset: {dataset_dir}')
         self.crop_size = crop_size
         self.is_val = mode == "val"
         self.is_train = mode == "train"

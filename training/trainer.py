@@ -34,7 +34,7 @@ class TrainConfiguration:
     freeze_epochs: int = 0,
     test_every: int = 1
     world_size: int = 1
-    output_dir: str = "/content/drive/MyDrive/Github/geopose/weights/"
+    output_dir: str = "/home/s0105/_scratch2/project/weights/"
     prefix: str = ""
     resume_checkpoint: str = None
     workers: int = 8
@@ -193,6 +193,7 @@ class PytorchTrainer(ABC):
                                        num_workers=self.train_config.workers,
                                        shuffle=train_sampler is None, sampler=train_sampler, pin_memory=False,
                                        drop_last=True)
+        print(f'train_data_loader len: {len(train_data_loader)}, batch size: {self.train_batch_size}')
 
         return train_data_loader
 
