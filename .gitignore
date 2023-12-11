@@ -22,3 +22,4 @@ logs/
 output/
 preds/
 weights/
+test/
