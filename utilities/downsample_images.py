@@ -47,7 +47,6 @@ def downsample_images(args):
     outdir.mkdir(exist_ok=True)
     rgb_paths = list(indir.glob(f"*_RGB.{args.rgb_suffix}"))
     print(f"rgb paths length: {len(rgb_paths)}")
-    rgb_paths = rgb_paths[3811:]
     print(f"new paths length: {len(rgb_paths)}")
     if rgb_paths == []: rgb_paths = list(indir.glob(f"*_RGB*.{args.rgb_suffix}"))  # original file names
     
@@ -60,7 +59,9 @@ def downsample_images(args):
         vflow_path = rgb_path.with_name(
             rgb_path.name.replace("_RGB", "_VFLOW")
         ).with_suffix(".json")
+        print(f'loading rgb: {rgb_path}')
         rgb = load_image(rgb_path, args)  # args.unit used to convert units on load
+        print(f'loading agl: {agl_path}')
         agl = load_image(agl_path, args)  # args.unit used to convert units on load
         _, _, _, vflow_data = load_vflow(
             vflow_path, agl, args
