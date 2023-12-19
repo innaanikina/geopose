@@ -68,7 +68,16 @@
         "display": true,
         "params": {
         }
-      }
+      },
+     {
+       "name": "dice",
+       "type": "DiceLossCalculator",
+       "weight": 0.05,
+       "display": true,
+       "params": {
+
+       }
+     }
 
    ]
 

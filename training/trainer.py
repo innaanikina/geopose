@@ -147,12 +147,14 @@ class PytorchTrainer(ABC):
             self.optimizer.zero_grad()
             with torch.cuda.amp.autocast():
                 output = self.model(imgs)
+                print(f"output: {output}")
                 total_loss = 0
                 for loss_def in self.losses:
                     l = loss_def.loss.calculate_loss(output, sample)
                     if loss_def.display:
                         avg_meters[loss_def.name].update(l.item(), imgs.size(0))
                     total_loss += loss_def.weight * l
+
             loss_meter.update(total_loss.item(), imgs.size(0))
             avg_metrics = {k: v.avg for k, v in avg_meters.items()}
             iterator.set_postfix({"lr": float(self.scheduler.get_lr()[-1]),

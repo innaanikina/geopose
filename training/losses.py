@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 import torch
 from torch.nn import MSELoss
+import segmentation_models_pytorch as smp
 
 
 class LossCalculator(ABC):
@@ -9,6 +10,19 @@ class LossCalculator(ABC):
     @abstractmethod
     def calculate_loss(self, outputs, sample):
         pass
+
+
+class DiceLossCalculator(LossCalculator):
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.dice_loss = smp.utils.losses.DiceLoss(**kwargs)
+
+    def calculate_loss(self, outputs, sample):
+        mask = sample["facade"].cuda().float()
+        pred = outputs["facade"]
+        loss = self.dice_loss(pred, mask)
+        print(f"dice loss: {loss}")
+        return loss
 
 
 class MSEScaleLossCalculator(LossCalculator):
@@ -101,6 +115,7 @@ def weighted_focal_mse_loss(inputs, targets, activate='sigmoid', beta=.2, gamma=
         loss *= weights.expand_as(loss)
     loss = torch.mean(loss)
     return loss
+
 
 class FocalAGLLossCalculator(LossCalculator):
 
