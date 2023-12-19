@@ -147,7 +147,8 @@ class PytorchTrainer(ABC):
             self.optimizer.zero_grad()
             with torch.cuda.amp.autocast():
                 output = self.model(imgs)
-                print(f"output: {output}")
+                print(f"output: {output.keys()}")
+                print(f"height size: {output['height'].size()}, mag size: {output['mag'].size()}")
                 total_loss = 0
                 for loss_def in self.losses:
                     l = loss_def.loss.calculate_loss(output, sample)

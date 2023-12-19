@@ -187,15 +187,15 @@ def test(args):
         predictions_dir = Path(args.predictions_dir)
         for images, rgb_paths in tqdm(test_loader):
             images = images.float().cuda()
-            print(images)
+            # print(images)
             pred = predict_tta(models, images)
-            print("pred", pred)
+            # print("pred", pred)
             numpy_preds = []
             for i in range(len(pred)):
                 numpy_preds.append(pred[i].detach().cpu().numpy())
 
             xydir_pred, agl_pred, mag_pred, scale_pred = numpy_preds
-            print("agl_pred", agl_pred)
+            # print("agl_pred", agl_pred)
 
             if scale_pred.ndim == 0:
                 scale_pred = np.expand_dims(scale_pred, axis=0)
