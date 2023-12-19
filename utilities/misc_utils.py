@@ -6,6 +6,7 @@ import cv2
 from tqdm import tqdm
 from PIL import Image
 import matplotlib.pyplot as plt
+import imageio.v2 as imageio
 
 
 UNITS_PER_METER_CONVERSION_FACTORS = {"cm": 100.0, "m": 1.0}
@@ -70,7 +71,11 @@ def load_image(
     # image = image.ReadAsArray()
     image = cv2.imread(str(image_path))
 
-    print(f"image shape from load_image: {image.shape}")
+    try:
+        print(f"image shape from load_image: {image.shape}")
+    except AttributeError:
+        print(f"AttributeError in image: {image_path}")
+        image = imageio.imread(image_path)
 
     # convert AGL units and fill nan placeholder with nan
     if "AGL" in image_path.name:
