@@ -27,7 +27,8 @@ transforms = [
     A.RandomBrightnessContrast(p=0.5),
     A.RandomGamma(p=0.3)
 ]
-transforms =  A.Compose(transforms)
+transforms = A.Compose(transforms)
+
 
 def load_image(
         image_path,
