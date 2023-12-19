@@ -135,7 +135,7 @@ class GeoposeDataset(Dataset):
             scale = vflow_data["scale"]
             if self.is_train:
                 image = transforms(image=image)["image"]
-                image, mag, xdir, ydir, agl, scale = augment_vflow(
+                image, mag, xdir, ydir, agl, facade, scale = augment_vflow(
                     image,
                     mag,
                     xdir,
@@ -143,6 +143,7 @@ class GeoposeDataset(Dataset):
                     vflow_data["angle"],
                     vflow_data["scale"],
                     agl=agl,
+                    facade=facade
                 )
             xdir = np.float32(xdir)
             ydir = np.float32(ydir)

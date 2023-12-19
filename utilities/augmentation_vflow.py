@@ -17,6 +17,7 @@ def augment_vflow(
     angle,
     scale,
     agl=None,
+    facade=None,
     rotate_prob=0.3,
     flip_prob=0.3,
     scale_prob=0.3,
@@ -49,8 +50,8 @@ def augment_vflow(
     # rescale
     if rng.uniform(0, 1) < scale_prob:
         factor = 0.7 + 0.6 * rng.random()
-        image, mag, agl, scale = rescale_vflow(image, mag, agl, scale, factor)
-    return image, mag, xdir, ydir, agl, scale
+        image, mag, agl, facade, scale = rescale_vflow(image, mag, agl, facade, scale, factor)
+    return image, mag, xdir, ydir, agl, facade, scale
 
 
 def flip(image, mag, agl, dim):
@@ -138,13 +139,14 @@ def rescale(image, factor, fill_value=0, interpolation=cv2.INTER_NEAREST):
     return rescaled_image
 
 
-def rescale_vflow(rgb, mag, agl, scale, factor):
+def rescale_vflow(rgb, mag, agl, facade, scale, factor):
     rescaled_rgb = rescale(rgb, factor, fill_value=0, interpolation=cv2.INTER_LINEAR)
     rescaled_agl = rescale(agl, factor, fill_value=np.nan)
+    rescaled_facade = rescale(facade, factor, fill_value=np.nan)
     rescaled_mag = rescale(mag, factor, fill_value=np.nan)
     rescaled_mag[np.isfinite(rescaled_mag)] /= factor
     scale /= factor
-    return rescaled_rgb, rescaled_mag, rescaled_agl, scale
+    return rescaled_rgb, rescaled_mag, rescaled_agl, rescaled_facade, scale
 
 
 def warp_flow(img, flow):
