@@ -16,13 +16,17 @@ class DiceLossCalculator(LossCalculator):
     def __init__(self, **kwargs):
         super().__init__()
         self.dice_loss = smp.utils.losses.DiceLoss(**kwargs)
+        self.classes = [6, 64, 65]
 
     def calculate_loss(self, outputs, sample):
         mask = sample["facade"].cuda().float()
-        pred = outputs["facade"]
-        loss = self.dice_loss(pred, mask)
+        # pred = outputs["facade"]
+        loss = self.dice_loss(mask, mask)
         print(f"dice loss: {loss}")
         return loss
+
+    def make_mask(self, mask):
+        pass
 
 
 class MSEScaleLossCalculator(LossCalculator):
