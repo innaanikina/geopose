@@ -20,8 +20,8 @@ class DiceLossCalculator(LossCalculator):
 
     def calculate_loss(self, outputs, sample):
         mask = sample["facade"].cuda().float()
-        # pred = outputs["facade"]
-        loss = self.dice_loss(mask, mask)
+        pred = outputs["facade"]
+        loss = self.dice_loss(pred, mask)
         print(f"dice loss: {loss}")
         return loss
 

@@ -213,7 +213,7 @@ def test(args):
                 # agl pred
                 curr_agl_pred = agl_pred[batch_ind, 0, :, :]
                 curr_agl_pred[curr_agl_pred < 0] = 0
-                print("curr_agl_pred", curr_agl_pred)
+                # print("curr_agl_pred", curr_agl_pred)
                 agl_resized = cv2.resize(
                     curr_agl_pred,
                     (
@@ -222,7 +222,7 @@ def test(args):
                     ),
                     interpolation=cv2.INTER_NEAREST,
                 )
-                print("agl_resized", agl_resized)
+                # print("agl_resized", agl_resized)
 
                 # save
                 rgb_path = predictions_dir / Path(rgb_paths[batch_ind]).name

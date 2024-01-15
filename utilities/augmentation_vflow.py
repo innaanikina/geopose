@@ -33,19 +33,19 @@ def augment_vflow(
         max_factor = 2.0
         max_scale_agl = min(max_factor, (max_building_agl / max_agl))
         scale_height = rng.uniform(1.0, max(1.0, max_scale_agl))
-        image, mag, agl = warp_agl(image, mag, angle, agl, scale_height, max_factor)
+        image, mag, agl, facade = warp_agl(image, mag, angle, agl, facade, scale_height, max_factor)
     # rotate
     if rng.uniform(0, 1) < rotate_prob:
         rotate_angle = rng.randint(0, 360)
         xdir, ydir = rotate_xydir(xdir, ydir, rotate_angle)
-        image, mag, agl = rotate_image(image, mag, agl, rotate_angle)
+        image, mag, agl, facade = rotate_image(image, mag, agl, facade, rotate_angle)
     # x flip
     if rng.uniform(0, 1) < flip_prob:
-        image, mag, agl = flip(image, mag, agl, dim="x")
+        image, mag, agl, facade = flip(image, mag, agl, facade, dim="x")
         xdir *= -1
     # y flip
     if rng.uniform(0, 1) < flip_prob:
-        image, mag, agl = flip(image, mag, agl, dim="y")
+        image, mag, agl, facade = flip(image, mag, agl, facade, dim="y")
         ydir *= -1
     # rescale
     if rng.uniform(0, 1) < scale_prob:
@@ -54,18 +54,22 @@ def augment_vflow(
     return image, mag, xdir, ydir, agl, facade, scale
 
 
-def flip(image, mag, agl, dim):
+def flip(image, mag, agl, facade, dim):
     if dim == "x":
         image = image[:, ::-1, :]
         mag = mag[:, ::-1]
         if agl is not None:
             agl = agl[:, ::-1]
+        if facade is not None:
+            facade = facade[:, ::-1]
     elif dim == "y":
         image = image[::-1, :, :]
         mag = mag[::-1, :]
         if agl is not None:
             agl = agl[::-1, :]
-    return image, mag, agl
+        if facade is not None:
+            facade = facade[::-1, :]
+    return image, mag, agl, facade
 
 
 def get_crop_region(image_rotated, image):
@@ -82,7 +86,7 @@ def rotate_xydir(xdir, ydir, rotate_angle):
     return xdir, ydir
 
 
-def rotate_image(image, mag, agl, angle, image_only=False):
+def rotate_image(image, mag, agl, facade, angle, image_only=False):
     if image_only:
         h, w = image.shape[:2]
     else:
@@ -109,13 +113,18 @@ def rotate_image(image, mag, agl, angle, image_only=False):
         if agl is None
         else cv2.warpAffine(agl, rot_mat, (wnew, hnew), flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=np.nan)
     )
+    facade_rotated = (
+        None
+        if facade is None
+        else cv2.warpAffine(facade, rot_mat, (wnew, hnew), flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=np.nan)
+    )
     mag_rotated = cv2.warpAffine(mag, rot_mat, (wnew, hnew), flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=np.nan)
     # if image_rotated is None:
     #     r1, c1, r2, c2 = get_crop_region(mag_rotated, mag)
     #mag_rotated = mag_rotated[r1:r2, c1:c2]
     # if agl_rotated is not None:
     #     agl_rotated = agl_rotated[r1:r2, c1:c2]
-    return image_rotated, mag_rotated, agl_rotated
+    return image_rotated, mag_rotated, agl_rotated, facade_rotated
 
 
 def rescale(image, factor, fill_value=0, interpolation=cv2.INTER_NEAREST):
@@ -158,7 +167,7 @@ def warp_flow(img, flow):
     return res
 
 
-def warp_agl(rgb, mag, angle, agl, scale_factor, max_scale_factor):
+def warp_agl(rgb, mag, angle, agl, facade, scale_factor, max_scale_factor):
     mag = cv2.medianBlur(mag, 5)
     mag2 = mag * (scale_factor - 1.0)
     x2 = -mag2 * np.sin(angle)
@@ -175,5 +184,8 @@ def warp_agl(rgb, mag, angle, agl, scale_factor, max_scale_factor):
     agl = agl * scale_factor
     mag = warp_flow(mag, flow)
     mag = mag * scale_factor
-    return rgb, mag, agl
+    if facade is not None:
+        facade = warp_flow(facade, flow)
+        facade = facade * scale_factor
+    return rgb, mag, agl, facade
 
