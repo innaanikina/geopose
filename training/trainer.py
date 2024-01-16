@@ -293,6 +293,7 @@ class PytorchTrainer(ABC):
         model = unet.__dict__[self.conf['network']](**self.conf["encoder_params"])
         model = model.cuda()
         self._load_checkpoint(model)
+        model.add_segm_head()
 
         if self.train_config.distributed:
             model = SyncBatchNorm.convert_sync_batchnorm(model, self.pg)
