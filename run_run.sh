@@ -8,4 +8,4 @@ source /opt/intelpython3/bin/activate
 conda activate pytorch_k40_1.9
 module load gpu/cuda-11.5
 
-sbatch  -p v100 --mem=32000 --gres=gpu:v100:1 --cpus-per-task=1 -t 20:00:00 -x tesla-a100 --job-name=segm --output='./logs/test_cs %j.txt' --wrap='./run.sh'
+sbatch  -p v100 --mem=32000 --gres=gpu:v100:1 --cpus-per-task=1 -t 20:00:00 -C a100 --job-name=segm --output='./logs/test_cs %j.txt' --wrap='./run.sh'
