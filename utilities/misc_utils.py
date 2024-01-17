@@ -67,15 +67,15 @@ def load_image(
     image_path = Path(image_path)
     if not image_path.exists():
         return None
-    # image = gdal.Open(str(image_path))
-    # image = image.ReadAsArray()
-    image = cv2.imread(str(image_path))
+    image = gdal.Open(str(image_path))
+    image = image.ReadAsArray()
+    # image = cv2.imread(str(image_path))
 
-    try:
-        print(f"image shape from load_image: {image.shape}")
-    except AttributeError:
-        print(f"AttributeError in image: {image_path}")
-        image = imageio.imread(image_path)
+    # try:
+    #     print(f"image shape from load_image: {image.shape}")
+    # except AttributeError:
+    #     print(f"AttributeError in image: {image_path}")
+    #     image = imageio.imread(image_path)
 
     # convert AGL units and fill nan placeholder with nan
     if "AGL" in image_path.name:
@@ -86,8 +86,8 @@ def load_image(
         image = (image / units_per_meter).astype(dtype_out)
 
     # transpose if RGB
-    # if len(image.shape) == 3:
-    #     image = np.transpose(image, [1, 2, 0])
+    if len(image.shape) == 3:
+        image = np.transpose(image, [1, 2, 0])
 
     return image
 

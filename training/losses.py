@@ -17,16 +17,39 @@ class DiceLossCalculator(LossCalculator):
         super().__init__()
         self.dice_loss = smp.utils.losses.DiceLoss(**kwargs)
         self.classes = [6, 64, 65]
+        self.test_dice()
 
     def calculate_loss(self, outputs, sample):
         mask = sample["facade"].cuda().float()
+        # print(f"mask 0:\n{mask[0]}")
+        # print(f"mask 1:\n{mask[1]}")
         # pred = outputs["facade"]
+        # print(f"outputs facade shape: {pred.shape}")
         loss = self.dice_loss(mask, mask)
         print(f"dice loss: {loss}")
         return loss
 
     def make_mask(self, mask):
         pass
+        
+    def test_dice(self):
+        img_shape = 2048, 2048
+        ones = torch.ones(img_shape, dtype=torch.int)
+        ones = ones.reshape(1, 1, 2048, 2048)
+        print("Testing DiceLoss on ones (should be 1)")
+        self.dice_loss.classes = [1]
+        loss = self.dice_loss(ones, ones)
+        print(f"Result: {loss}")
+        zeros = torch.zeros(img_shape, dtype=torch.int)
+        zeros = zeros.reshape(1, 1, 2048, 2048)
+        print("Testing DiceLoss on zeros (should be 1)")
+        self.dice_loss.classes = [0]
+        loss = self.dice_loss(zeros, zeros)
+        print(f"Result: {loss}")
+        print("Testing DiceLoss on ones and zeros (should be bad)")
+        self.dice_loss.classes = [1]
+        loss = self.dice_loss(zeros, ones)
+        print(f"Result: {loss}")
 
 
 class MSEScaleLossCalculator(LossCalculator):

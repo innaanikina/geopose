@@ -147,8 +147,8 @@ class PytorchTrainer(ABC):
             self.optimizer.zero_grad()
             with torch.cuda.amp.autocast():
                 output = self.model(imgs)
-                print(f"output: {output.keys()}")
-                print(f"height size: {output['height'].size()}, mag size: {output['mag'].size()}")
+                # print(f"output: {output.keys()}")
+                # print(f"height size: {output['height'].size()}, mag size: {output['mag'].size()}")
                 total_loss = 0
                 for loss_def in self.losses:
                     l = loss_def.loss.calculate_loss(output, sample)
@@ -294,6 +294,8 @@ class PytorchTrainer(ABC):
         model = model.cuda()
         self._load_checkpoint(model)
         model.add_segm_head()
+        # added segm_head to cuda
+        model = model.cuda()
 
         if self.train_config.distributed:
             model = SyncBatchNorm.convert_sync_batchnorm(model, self.pg)
