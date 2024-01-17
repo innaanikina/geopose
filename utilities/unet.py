@@ -200,11 +200,11 @@ class TimmUnet(AbstractModel):
         bottlenecks = self.bottlenecks
         for idx, bottleneck in enumerate(bottlenecks):
             rev_idx = - (idx + 1)
-            x = self.decoder_stages[rev_idx](x)
-            x = bottleneck(x, enc_results[rev_idx - 1])
+            dec_x = self.decoder_stages[rev_idx](x)
+            dec_x = bottleneck(dec_x, enc_results[rev_idx - 1])
         xydir = self.xydir_head(enc_results[-1])
-        x = self.last_upsample(x)
-        decoder_output = x
+        dec_x = self.last_upsample(dec_x)
+        decoder_output = dec_x
 
         # декодер для сегментации
         segm_bottlenecks = self.segm_bottlenecks
@@ -212,8 +212,8 @@ class TimmUnet(AbstractModel):
             rev_idx = - (idx + 1)
             x = self.segm_decoder_stages[rev_idx](x)
             x = bottleneck(x, enc_results[rev_idx - 1])
-        segm_decoder_output = self.segm_last_upsample(x) # задается в строчке 178, он может быть не создан если не выолнены условия
-                                        # до этой строчки
+        segm_decoder_output = self.segm_last_upsample(x)  # задается в строчке 178, он может быть не создан
+                                                            # если не выполнены условия до этой строчки
         segm = self.segm_head(segm_decoder_output).contiguous(memory_format=torch.contiguous_format)
 
         height = self.height_head(decoder_output).contiguous(memory_format=torch.contiguous_format)
