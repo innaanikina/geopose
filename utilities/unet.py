@@ -114,6 +114,10 @@ class AbstractModel(nn.Module):
 
 class TimmUnet(AbstractModel):
     def __init__(self, encoder='resnet34', use_last_decoder=True, **kwargs):
+        self.segm_last_upsample = None
+        self.segm_decoder_stages = None
+        self.segm_bottlenecks = None
+        self.segm_head = None
         if not hasattr(self, 'first_layer_stride_two'):
             self.first_layer_stride_two = True
         if not hasattr(self, 'decoder_block'):
@@ -170,6 +174,7 @@ class TimmUnet(AbstractModel):
         self.encoder = backbone
 
     def add_segm_head(self, use_last_decoder=True):
+        return
         self.segm_head = SegmentationHead(
             in_channels=self.last_upsample_filters,
             out_channels=1,
@@ -206,22 +211,22 @@ class TimmUnet(AbstractModel):
         dec_x = self.last_upsample(dec_x)
         decoder_output = dec_x
 
-        # декодер для сегментации
-        segm_bottlenecks = self.segm_bottlenecks
-        for idx, bottleneck in enumerate(segm_bottlenecks):
-            rev_idx = - (idx + 1)
-            x = self.segm_decoder_stages[rev_idx](x)
-            x = bottleneck(x, enc_results[rev_idx - 1])
-        segm_decoder_output = self.segm_last_upsample(x)  # задается в строчке 178, он может быть не создан
-                                                            # если не выполнены условия до этой строчки
-        segm = self.segm_head(segm_decoder_output).contiguous(memory_format=torch.contiguous_format)
+        # # декодер для сегментации
+        # segm_bottlenecks = self.segm_bottlenecks
+        # for idx, bottleneck in enumerate(segm_bottlenecks):
+        #     rev_idx = - (idx + 1)
+        #     x = self.segm_decoder_stages[rev_idx](x)
+        #     x = bottleneck(x, enc_results[rev_idx - 1])
+        # segm_decoder_output = self.segm_last_upsample(x)  # задается в строчке 178, он может быть не создан
+        #                                                     # если не выполнены условия до этой строчки
+        # segm = self.segm_head(segm_decoder_output).contiguous(memory_format=torch.contiguous_format)
 
         height = self.height_head(decoder_output).contiguous(memory_format=torch.contiguous_format)
         mag = self.mag_head(decoder_output).contiguous(memory_format=torch.contiguous_format)
         scale = self.scale_head(mag, height)
         if scale.ndim == 0:
             scale = torch.unsqueeze(scale, axis=0)
-
+        segm = None
         return {"xydir": xydir, "height": height, "mag": mag, "scale": scale, "segm": segm}
 
     def get_decoder(self, layer):
