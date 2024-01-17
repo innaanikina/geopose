@@ -5,7 +5,7 @@ import torch.hub
 from torch.nn import Dropout2d, UpsamplingBilinear2d, AdaptiveAvgPool2d
 from torch.utils import model_zoo
 
-from utilities.unet_vflow import EncoderRegressionHead, RegressionHead, ScaleHead
+from utilities.unet_vflow import EncoderRegressionHead, RegressionHead, ScaleHead, SegmentationHead
 
 encoder_params = {
     "tf_efficientnetv2_l_in21k": {
