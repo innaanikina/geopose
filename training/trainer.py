@@ -294,6 +294,8 @@ class PytorchTrainer(ABC):
         model = model.cuda()
         self._load_checkpoint(model)
         model.add_segm_head()
+        # added segm_head to cuda
+        model = model.cuda()
 
         if self.train_config.distributed:
             model = SyncBatchNorm.convert_sync_batchnorm(model, self.pg)
