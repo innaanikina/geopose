@@ -120,7 +120,7 @@ def parse_args():
     arg('--config', metavar='CONFIG_FILE', help='path to configuration file', default="configs/b3.json")
     arg('--workers', type=int, default=16, help='number of cpu threads to use')
     arg('--gpu', type=str, default='0', help='List of GPUs for parallel training, e.g. 0,1,2,3')
-    arg('--output-dir', type=str, default='/home/s0105/_scratch2/project/weights/')
+    arg('--output-dir', type=str, default='/home/s0101/_scratch2/geopose_inna/weights')
     arg('--resume', type=str, default='')
     arg('--fold', type=int, default=0)
     arg('--prefix', type=str, default='')
