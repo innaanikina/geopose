@@ -217,7 +217,7 @@ class TimmUnet(AbstractModel):
         if scale.ndim == 0:
             scale = torch.unsqueeze(scale, axis=0)
 
-        return {"xydir": xydir, "height": height, "mag": mag, "scale": scale}
+        return {"xydir": xydir, "height": height, "mag": mag, "scale": scale, "segm": None}
 
     def get_decoder(self, layer):
         in_channels = self.filters[layer + 1] if layer + 1 == len(self.decoder_filters) else self.decoder_filters[
