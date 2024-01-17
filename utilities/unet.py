@@ -213,14 +213,14 @@ class TimmUnet(AbstractModel):
         decoder_output = dec_x
 
         # # декодер для сегментации
-        # segm_bottlenecks = self.segm_bottlenecks
-        # for idx, bottleneck in enumerate(segm_bottlenecks):
-        #     rev_idx = - (idx + 1)
-        #     x = self.segm_decoder_stages[rev_idx](x)
-        #     x = bottleneck(x, enc_results[rev_idx - 1])
-        # segm_decoder_output = self.segm_last_upsample(x)  # задается в строчке 178, он может быть не создан
-        #                                                     # если не выполнены условия до этой строчки
-        # segm = self.segm_head(segm_decoder_output).contiguous(memory_format=torch.contiguous_format)
+        segm_bottlenecks = self.segm_bottlenecks
+        for idx, bottleneck in enumerate(segm_bottlenecks):
+            rev_idx = - (idx + 1)
+            x = self.segm_decoder_stages[rev_idx](x)
+            x = bottleneck(x, enc_results[rev_idx - 1])
+        segm_decoder_output = self.segm_last_upsample(x)  # задается в строчке 178, он может быть не создан
+                                                            # если не выполнены условия до этой строчки
+        segm = self.segm_head(segm_decoder_output).contiguous(memory_format=torch.contiguous_format)
 
         height = self.height_head(decoder_output).contiguous(memory_format=torch.contiguous_format)
         mag = self.mag_head(decoder_output).contiguous(memory_format=torch.contiguous_format)
