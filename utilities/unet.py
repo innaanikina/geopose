@@ -114,10 +114,10 @@ class AbstractModel(nn.Module):
 
 class TimmUnet(AbstractModel):
     def __init__(self, encoder='resnet34', use_last_decoder=True, **kwargs):
-        # self.segm_last_upsample = None
-        # self.segm_decoder_stages = None
-        # self.segm_bottlenecks = None
-        # self.segm_head = None
+        self.segm_last_upsample = None
+        self.segm_decoder_stages = None
+        self.segm_bottlenecks = None
+        self.segm_head = None
         if not hasattr(self, 'first_layer_stride_two'):
             self.first_layer_stride_two = True
         if not hasattr(self, 'decoder_block'):
