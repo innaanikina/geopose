@@ -174,7 +174,6 @@ class TimmUnet(AbstractModel):
         self.encoder = backbone
 
     def add_segm_head(self, use_last_decoder=True):
-        return
         self.segm_head = SegmentationHead(
             in_channels=self.last_upsample_filters,
             out_channels=1,
@@ -227,7 +226,7 @@ class TimmUnet(AbstractModel):
         scale = self.scale_head(mag, height)
         if scale.ndim == 0:
             scale = torch.unsqueeze(scale, axis=0)
-        segm = None
+
         return {"xydir": xydir, "height": height, "mag": mag, "scale": scale, "segm": segm}
 
     def get_decoder(self, layer):
