@@ -10,6 +10,7 @@
 *.npy
 *.npz
 utilities/build/*
+utilities/invert_flow.c
 submission*
 myfiles/
 .gitignore
