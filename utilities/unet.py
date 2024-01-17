@@ -200,15 +200,17 @@ class TimmUnet(AbstractModel):
         x = x.contiguous(memory_format=torch.channels_last)
         enc_results = self.encoder(x)
         x = enc_results[-1]
+
+        dec_x = x
         bottlenecks = self.bottlenecks
         for idx, bottleneck in enumerate(bottlenecks):
             rev_idx = - (idx + 1)
-            x = self.decoder_stages[rev_idx](x)
-            x = bottleneck(x, enc_results[rev_idx - 1])
+            dec_x = self.decoder_stages[rev_idx](dec_x)
+            dec_x = bottleneck(dec_x, enc_results[rev_idx - 1])
         xydir = self.xydir_head(enc_results[-1])
-        x = self.last_upsample(x)
+        dec_x = self.last_upsample(dec_x)
 
-        decoder_output = x
+        decoder_output = dec_x
         height = self.height_head(decoder_output).contiguous(memory_format=torch.contiguous_format)
         mag = self.mag_head(decoder_output).contiguous(memory_format=torch.contiguous_format)
         scale = self.scale_head(mag, height)
