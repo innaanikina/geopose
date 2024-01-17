@@ -202,10 +202,11 @@ class TimmUnet(AbstractModel):
         x = enc_results[-1]
 
         # первый декодер
+        dec_x = x
         bottlenecks = self.bottlenecks
         for idx, bottleneck in enumerate(bottlenecks):
             rev_idx = - (idx + 1)
-            dec_x = self.decoder_stages[rev_idx](x)
+            dec_x = self.decoder_stages[rev_idx](dec_x)
             dec_x = bottleneck(dec_x, enc_results[rev_idx - 1])
         xydir = self.xydir_head(enc_results[-1])
         dec_x = self.last_upsample(dec_x)
