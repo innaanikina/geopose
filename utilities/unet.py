@@ -114,6 +114,10 @@ class AbstractModel(nn.Module):
 
 class TimmUnet(AbstractModel):
     def __init__(self, encoder='resnet34', use_last_decoder=True, **kwargs):
+        self.segm_last_upsample = None
+        self.segm_decoder_stages = None
+        self.segm_bottlenecks = None
+        self.segm_head = None
         if not hasattr(self, 'first_layer_stride_two'):
             self.first_layer_stride_two = True
         if not hasattr(self, 'decoder_block'):
@@ -143,6 +147,7 @@ class TimmUnet(AbstractModel):
                                                            self.last_upsample_filters)
             else:
                 self.last_upsample = UpsamplingBilinear2d(scale_factor=2)
+
         self.xydir_head = EncoderRegressionHead(
             in_channels=self.filters[-1],
             out_channels=2,
@@ -167,6 +172,27 @@ class TimmUnet(AbstractModel):
         self._initialize_weights()
         self.dropout = Dropout2d(p=0.0)
         self.encoder = backbone
+
+    def add_segm_head(self, use_last_decoder=True):
+        return
+        self.segm_head = SegmentationHead(
+            in_channels=self.last_upsample_filters,
+            out_channels=1,
+            kernel_size=3,
+        )
+
+        self.segm_bottlenecks = nn.ModuleList([self.bottleneck_type(self.filters[-i - 2] + f, f) for i, f in
+                                          enumerate(reversed(self.decoder_filters[:]))])
+
+        self.segm_decoder_stages = nn.ModuleList([self.get_decoder(idx) for idx in range(0, len(self.decoder_filters))])
+
+        if self.first_layer_stride_two:
+            if use_last_decoder:
+                self.segm_last_upsample = UnetDecoderBlock2Conv(self.decoder_filters[0], self.last_upsample_filters,
+                                                           self.last_upsample_filters)
+            else:
+                self.segm_last_upsample = UpsamplingBilinear2d(scale_factor=2)
+
 
     # noinspection PyCallingNonCallable
     def forward(self, x, city=None, **kwargs):
