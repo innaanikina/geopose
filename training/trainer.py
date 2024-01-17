@@ -34,7 +34,7 @@ class TrainConfiguration:
     freeze_epochs: int = 0,
     test_every: int = 1
     world_size: int = 1
-    output_dir: str = "/home/s0105/_scratch2/project/weights/"
+    output_dir: str = "/home/s0101/_scratch2/geopose_inna/weights"
     prefix: str = ""
     resume_checkpoint: str = None
     workers: int = 8
