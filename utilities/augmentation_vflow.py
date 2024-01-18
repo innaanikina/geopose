@@ -24,9 +24,6 @@ def augment_vflow(
     agl_prob=0.3,
     rng=RNG,
 ):
-    print("Start augment_vflow")
-    print(f"facade shape: {facade.shape}")
-    print(f"facade value counts before augmentations: {np.unique(facade, return_counts=True)}")
     # increase heights
     if np.isnan(mag).any() or np.isnan(agl).any():
         agl_prob = 0
@@ -37,29 +34,23 @@ def augment_vflow(
         max_scale_agl = min(max_factor, (max_building_agl / max_agl))
         scale_height = rng.uniform(1.0, max(1.0, max_scale_agl))
         image, mag, agl = warp_agl(image, mag, angle, agl, scale_height, max_factor) # facades are unchanged
-        print("warp_agl done")
     # rotate
     if rng.uniform(0, 1) < rotate_prob:
         rotate_angle = rng.randint(0, 360)
         xdir, ydir = rotate_xydir(xdir, ydir, rotate_angle)
         image, mag, agl, facade = rotate_image(image, mag, agl, facade, rotate_angle)
-        print("rotate_image done")
     # x flip
     if rng.uniform(0, 1) < flip_prob:
         image, mag, agl, facade = flip(image, mag, agl, facade, dim="x")
         xdir *= -1
-        print("flip x done")
     # y flip
     if rng.uniform(0, 1) < flip_prob:
         image, mag, agl, facade = flip(image, mag, agl, facade, dim="y")
         ydir *= -1
-        print("flip y done")
     # rescale
     if rng.uniform(0, 1) < scale_prob:
         factor = 0.7 + 0.6 * rng.random()
         image, mag, agl, facade, scale = rescale_vflow(image, mag, agl, facade, scale, factor)
-        print("rescale_flow done")
-    print(f"facade value counts after augmentations: {np.unique(facade, return_counts=True)}")
     return image, mag, xdir, ydir, agl, facade, scale
 
 

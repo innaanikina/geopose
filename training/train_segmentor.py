@@ -45,7 +45,7 @@ class GeoposeEvaluator(Evaluator):
         return {"r2": 0}
 
     def validate(self, dataloader: DataLoader, model: torch.nn.Module, distributed: bool = False, local_rank: int = 0,
-                 snapshot_name: str = "") -> Dict:
+                 snapshot_name: str = "", cur_epoch: int = -1) -> Dict:
 
         for sample in tqdm(dataloader):
                 image = sample["image"]
@@ -61,10 +61,14 @@ class GeoposeEvaluator(Evaluator):
                     xydir_pred, agl_pred, mag_pred, scale_pred = output['xydir'], output['height'], output['mag'], output[
                         'scale']
                     scale_pred = torch.unsqueeze(scale_pred, 1)
+                    segm_pred = output['segm']
+                    print(f"segm_pred tensor shape: {segm_pred.shape}")
                 agl = agl.cpu().detach().numpy()
                 xydir_pred = xydir_pred.cpu().detach().numpy()
                 agl_pred = agl_pred.cpu().detach().numpy()
                 scale_pred = scale_pred.cpu().detach().numpy()
+                segm_pred = segm_pred.cpu().detach().numpy()
+                print(f"segm_pred matrix: {segm_pred}")
 
                 for batch_ind in range(agl.shape[0]):
                     city = cities[batch_ind]
@@ -82,15 +86,26 @@ class GeoposeEvaluator(Evaluator):
                     curr_agl_pred = agl_pred[batch_ind, 0, :, :]
                     curr_agl_pred[curr_agl_pred < 0] = 0
                     agl_resized = curr_agl_pred
+                    
+                    # segm pred
+                    curr_segm_pred = segm_pred[batch_ind, 0, :, :]
+                    curr_segm_pred[curr_segm_pred < 0.5] = 0
+                    curr_segm_pred[curr_segm_pred >= 0.5] = 1
+                    print(f"segm_pred unique counts: {np.unique(curr_segm_pred, return_counts=True)}")
+                    print(f"segm pred min: {curr_segm_pred.min()}")
+                    print(f"segm_pred mean: {curr_segm_pred.mean()}")
+                    print(f"segm pred max: {curr_segm_pred.max()}")
 
                     # save
                     os.makedirs("preds", exist_ok=True)
                     agl_path = os.path.join("preds", f"{city}_{name}_AGL.tif")
                     vflow_path = os.path.join("preds", f"{city}_{name}_VFLOW.json")
+                    segm_path = os.path.join("preds", f"{city}_{name}_epoch{cur_epoch}_FACADE.tif")
 
-                    with open(vflow_path, "w") as f:
-                        json.dump(vflow_data, f)
-                    save_image(agl_path, agl_resized)
+                    # with open(vflow_path, "w") as f:
+                    #     json.dump(vflow_data, f)
+                    # save_image(agl_path, agl_resized)
+                    save_image(segm_path, curr_segm_pred)
         torch.cuda.synchronize()
         res = {}
         if local_rank == 0:
@@ -120,8 +135,7 @@ def parse_args():
     arg('--config', metavar='CONFIG_FILE', help='path to configuration file', default="configs/b3.json")
     arg('--workers', type=int, default=16, help='number of cpu threads to use')
     arg('--gpu', type=str, default='0', help='List of GPUs for parallel training, e.g. 0,1,2,3')
-    # arg('--output-dir', type=str, default='/home/s0101/_scratch2/geopose_inna/weights')
-    arg('--output-dir', type=str, default='/home/s0105/_scratch2/project/weights')
+    arg('--output-dir', type=str, default='')
     arg('--resume', type=str, default='')
     arg('--fold', type=int, default=0)
     arg('--prefix', type=str, default='')

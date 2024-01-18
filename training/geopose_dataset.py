@@ -131,6 +131,7 @@ class GeoposeDataset(Dataset):
             image = load_image(rgb_path, self.nan_placeholder, self.unit)
             agl = load_image(agl_path, self.nan_placeholder, self.unit)
             facade = load_image(facade_path, self.nan_placeholder, self.unit)
+            facade = self.process_facade(facade)
             mag, xdir, ydir, vflow_data = load_vflow(vflow_path, agl, unit=self.unit)
             scale = vflow_data["scale"]
             if self.is_train:
@@ -193,3 +194,8 @@ class GeoposeDataset(Dataset):
 
     def set_city(self, city: str):
         self.names = self.all_names[self.cities == city]
+        
+    def process_facade(self, facade):
+        facade[facade == 64] = 1
+        facade[facade != 1] = 0
+        return facade

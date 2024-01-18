@@ -34,8 +34,8 @@ class TrainConfiguration:
     freeze_epochs: int = 0,
     test_every: int = 1
     world_size: int = 1
-    # output_dir: str = "/home/s0105/_scratch2/project/weights"
-    output_dir: str = "/home/s0101/_scratch2/geopose_inna/weights"
+    output_dir: str = "/home/s0105/_scratch2/project/weights"
+    # output_dir: str = "/home/s0101/_scratch2/geopose_inna/weights"
     prefix: str = ""
     resume_checkpoint: str = None
     workers: int = 8
@@ -104,7 +104,8 @@ class PytorchTrainer(ABC):
                 metrics = self.evaluator.validate(self.get_val_loader(), self.model,
                                                   distributed=self.train_config.distributed,
                                                   local_rank=self.train_config.local_rank,
-                                                  snapshot_name=self.snapshot_name)
+                                                  snapshot_name=self.snapshot_name,
+                                                  cur_epoch=self.current_epoch + 1)
                 if self.train_config.local_rank == 0:
                     improved_metrics = self.evaluator.get_improved_metrics(self.current_metrics, metrics)
                     self.current_metrics.update(improved_metrics)
